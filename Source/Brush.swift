@@ -89,6 +89,6 @@ extension Brush: Equatable, Comparable, CustomStringConvertible {
     }
     
     public var description: String {
-        return "<Brush: color: \(color), width: (original: \(originalWidth), current: \(width)), opacity: \(opacity)>"
+        return "<Brush: color: \(color), width: (original: \(originalWidth), current: \(width)), opacity: \(opacity), blendMode: \(blendMode)>"
     }
 }
