@@ -158,7 +158,6 @@ open class SwiftyDrawView: UIView {
     /// Overriding draw(rect:) to stroke paths
     override open func draw(_ rect: CGRect) {
         guard let context: CGContext = UIGraphicsGetCurrentContext() else { return }
-        
         for item in drawItems {
             context.setLineCap(.round)
             context.setLineJoin(.round)
@@ -239,7 +238,7 @@ open class SwiftyDrawView: UIView {
         }
     }
     
-    func addLine(_ newLine: DrawItem) {
+    public func addLine(_ newLine: DrawItem) {
         drawItems.append(newLine)
         drawingHistory = drawItems // adding a new item should also update history
     }
