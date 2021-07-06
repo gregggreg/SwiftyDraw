@@ -240,9 +240,41 @@ open class SwiftyDrawView: UIView {
         }
     }
     
-    public func addLine(_ newLine: DrawItem) {
+    public func addLine(_ newLine: DrawItem, animationDuration: TimeInterval? = nil) {
         drawItems.append(newLine)
         drawingHistory = drawItems // adding a new item should also update history
+        if let duration = animationDuration,
+           duration > 0 {
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.path = newLine.path
+            shapeLayer.lineWidth = newLine.brush.width
+            shapeLayer.lineCap = .round
+            if (newLine.isFillPath)
+            {
+                shapeLayer.fillColor = newLine.brush.color.uiColor.cgColor
+            }
+            else {
+                shapeLayer.strokeColor = newLine.brush.color.uiColor.cgColor
+            }
+            layer.addSublayer(shapeLayer)
+            
+            let animation = CABasicAnimation(keyPath: "strokeEnd")
+            animation.duration = duration
+            animation.fromValue = 0.0
+            animation.toValue = 1.0
+            animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
+            animation.fillMode = CAMediaTimingFillMode.forwards
+            animation.isRemovedOnCompletion = true
+            
+            CATransaction.setCompletionBlock{ [weak self] in
+                print("Animation completed")
+                shapeLayer.removeFromSuperlayer()
+                self?.setNeedsDisplay()
+            }
+            
+            shapeLayer.add(animation, forKey: nil)
+            CATransaction.commit()
+        }
     }
     
     /// touchedEnded implementation to capture strokes
