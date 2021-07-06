@@ -158,6 +158,7 @@ open class SwiftyDrawView: UIView {
     /// Overriding draw(rect:) to stroke paths
     override open func draw(_ rect: CGRect) {
         guard let context: CGContext = UIGraphicsGetCurrentContext() else { return }
+        context.beginTransparencyLayer(auxiliaryInfo: nil)
         for item in drawItems {
             context.setLineCap(.round)
             context.setLineJoin(.round)
@@ -176,6 +177,7 @@ open class SwiftyDrawView: UIView {
                 context.strokePath()
             }
         }
+        context.endTransparencyLayer()
     }
     
     /// touchesBegan implementation to capture strokes
