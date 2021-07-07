@@ -95,7 +95,11 @@ open class SwiftyDrawView: UIView {
         var uiTouchTypes: [UITouch.TouchType] {
             switch self {
             case .finger:
-                return [.direct, .indirect]
+                if #available(iOS 13.4, *) {
+                    return [.direct, .indirect, .indirectPointer]
+                } else {
+                    return [.direct, .indirect]
+                }
             case .pencil:
                 return [.pencil, .stylus  ]
             }
