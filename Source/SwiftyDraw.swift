@@ -249,7 +249,7 @@ open class SwiftyDrawView: UIView {
             shapeLayer.path = newLine.path
             shapeLayer.lineWidth = newLine.brush.width
             shapeLayer.lineCap = .round
-            if (newLine.isFillPath)
+            if newLine.isFillPath
             {
                 shapeLayer.fillColor = newLine.brush.color.uiColor.cgColor
             }
@@ -267,9 +267,9 @@ open class SwiftyDrawView: UIView {
             animation.isRemovedOnCompletion = true
             
             CATransaction.setCompletionBlock{ [weak self] in
-                print("Animation completed")
+                guard let strongSelf = self else { return }
                 shapeLayer.removeFromSuperlayer()
-                self?.setNeedsDisplay()
+                strongSelf.setNeedsDisplay()
             }
             
             shapeLayer.add(animation, forKey: nil)
