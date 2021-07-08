@@ -76,6 +76,8 @@ open class SwiftyDrawView: UIView {
     
     /// Determines whether paths being draw would be filled or stroked.
     public var shouldFillPath = false
+    
+    public var shouldShowEraser = false
 
     /// Determines whether responde to Apple Pencil interactions, like the Double tap for Apple Pencil 2 to switch tools.
     public var isPencilInteractive : Bool = true {
@@ -115,6 +117,7 @@ open class SwiftyDrawView: UIView {
     public  var currentPoint: CGPoint = .zero     // made public
     private var previousPoint: CGPoint = .zero
     private var previousPreviousPoint: CGPoint = .zero
+    private var touchPoint: CGPoint?
     
     // For pencil interactions
     @available(iOS 12.1, *)
@@ -180,6 +183,18 @@ open class SwiftyDrawView: UIView {
                 context.addPath(item.path)
                 context.strokePath()
             }
+        }
+        if shouldShowEraser,
+           brush.blendMode == .clear,
+           let point = touchPoint {
+            context.setBlendMode(CGBlendMode.normal)
+            let color = UIColor.init(white: 0.8, alpha: 1)
+            context.setFillColor(color.cgColor)
+            context.setStrokeColor(color.cgColor)
+            context.setLineWidth(brush.width/2)
+            let rect = CGRect(x: point.x - brush.width/4, y: point.y - brush.width/4, width: brush.width/2, height: brush.width/2)
+            context.addEllipse(in: rect)
+            context.drawPath(using: .fillStroke)
         }
         context.endTransparencyLayer()
     }
@@ -284,12 +299,22 @@ open class SwiftyDrawView: UIView {
     /// touchedEnded implementation to capture strokes
     override open func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard isEnabled, let touch = touches.first else { return }
+        touchPoint = nil
+        if shouldShowEraser,
+           brush.blendMode == .clear {
+            setNeedsDisplay()
+        }
         delegate?.swiftyDraw(didFinishDrawingIn: self, using: touch)
     }
     
     /// touchedCancelled implementation
     override open func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard isEnabled, let touch = touches.first else { return }
+        touchPoint = nil
+        if shouldShowEraser,
+           brush.blendMode == .clear {
+            setNeedsDisplay()
+        }
         delegate?.swiftyDraw(didCancelDrawingIn: self, using: touch)
     }
     
@@ -336,12 +361,14 @@ open class SwiftyDrawView: UIView {
         previousPoint = touch.previousLocation(in: view)
         previousPreviousPoint = touch.previousLocation(in: view)
         currentPoint = touch.location(in: view)
+        touchPoint = touch.location(in: view)
     }
     
     private func updateTouchPoints(for touch: UITouch,in view: UIView) {
         previousPreviousPoint = previousPoint
         previousPoint = touch.previousLocation(in: view)
         currentPoint = touch.location(in: view)
+        touchPoint = touch.location(in: view)
     }
     
     private func createNewPath() -> CGMutablePath {
