@@ -14,6 +14,7 @@
  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 import UIKit
+import CoreGraphics
 
 // MARK: - Public Protocol Declarations
 
@@ -212,6 +213,12 @@ open class SwiftyDrawView: UIView {
         firstPoint = touch.location(in: self)
         let newLine = DrawItem(path: CGMutablePath(),
                            brush: Brush(color: brush.color.uiColor, width: brush.width, opacity: brush.opacity, blendMode: brush.blendMode), isFillPath: drawMode != .draw && drawMode != .line ? shouldFillPath : false)
+        if drawMode == .draw {
+            let newPath = createNewDot()
+            if let currentPath = drawItems.last {
+                currentPath.path.addPath(newPath)
+            }
+        }
         addLine(newLine)
     }
     
@@ -369,6 +376,12 @@ open class SwiftyDrawView: UIView {
         previousPoint = touch.previousLocation(in: view)
         currentPoint = touch.location(in: view)
         touchPoint = touch.location(in: view)
+    }
+    
+    private func createNewDot() -> CGMutablePath {
+        let subPath = createSubPath(firstPoint, mid2: firstPoint)
+        let newPath = addSubPathToPath(subPath)
+        return newPath
     }
     
     private func createNewPath() -> CGMutablePath {
