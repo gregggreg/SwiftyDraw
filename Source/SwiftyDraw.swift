@@ -213,13 +213,13 @@ open class SwiftyDrawView: UIView {
         firstPoint = touch.location(in: self)
         let newLine = DrawItem(path: CGMutablePath(),
                            brush: Brush(color: brush.color.uiColor, width: brush.width, opacity: brush.opacity, blendMode: brush.blendMode), isFillPath: drawMode != .draw && drawMode != .line ? shouldFillPath : false)
+        addLine(newLine)
         if drawMode == .draw {
             let newPath = createNewDot()
             if let currentPath = drawItems.last {
                 currentPath.path.addPath(newPath)
             }
         }
-        addLine(newLine)
     }
     
     /// touchesMoves implementation to capture strokes
